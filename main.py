@@ -66,15 +66,15 @@ class MainMenu():
     def __init__(self):
         # Initialize the title text surface
         self.title_text_surface = title_text_font.render("TicTacDota", 1,
-            WHITE)
+            BLACK)
         # Initialize all the other text surfaces
         self.play_timbersaw_surface = menu_text_font.render("Play against" +
-            " Timbersaw", True, WHITE)
+            " Timbersaw", True, BLACK)
         self.play_stormspirit_surface = menu_text_font.render("Play against" +
-            " Storm Spirit", True, WHITE)
+            " Storm Spirit", True, BLACK)
         self.play_self_surface = menu_text_font.render("Play against yourself",
-            True, WHITE)
-        self.exit_text_surface = menu_text_font.render("Exit", True, WHITE)
+            True, BLACK)
+        self.exit_text_surface = menu_text_font.render("Exit", True, BLACK)
 
 def play_music(music_path):
     """
@@ -109,6 +109,11 @@ def main():
     # Create a variable to check which game screen we are in. It is initially
     # set to the main menu.
     current_game_screen = "main"
+
+    # Initialize the game background
+    bg_surface = pygame.image.load(os.path.join("images", "bg_main.png"))
+    # Blit the game background
+    screen.blit(bg_surface, (0,0))
 
     # Start the background music
     pygame.mixer.init()
