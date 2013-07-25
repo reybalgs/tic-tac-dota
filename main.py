@@ -39,13 +39,16 @@ pygame.font.init()
 
 # Important global variables
 # Fonts
-title_text_font = pygame.font.Font(ARIAL_PATH, 40)
-menu_text_font = pygame.font.Font(ARIAL_PATH, 28)
+menu_text_font = pygame.font.Font(ARIAL_PATH, 36)
+
+# Positions
+main_menu_text_pos = list()
 
 # Window, display and main screen
 window = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
 pygame.display.set_caption('TicTacDota')
 screen = pygame.display.get_surface()
+background = pygame.Surface(screen.get_size())
 
 class MainMenu():
     """
@@ -55,26 +58,32 @@ class MainMenu():
         """
         Draw the main menu.
         """
-        # Blit the title text surface into the screen
-        screen.blit(self.title_text_surface, (200, 60))
-        # Blit all the other text surfaces onto the screen
-        screen.blit(self.play_timbersaw_surface, (150, 180))
-        screen.blit(self.play_stormspirit_surface, (150, 240))
-        screen.blit(self.play_self_surface, (150, 300))
-        screen.blit(self.exit_text_surface, (150, 360))
+        # Blit the surfaces one by one
+        for text in self.text_surfaces:
+            text_pos = text.get_rect(centerx = background.get_width() / 2,
+                    centery = self.start_y + menu_text_font.get_height() + 8)
+            # Store the position
+            self.text_positions.append(text_pos)
+            # Update the startY position
+            self.start_y = self.start_y + menu_text_font.get_height() + 8
+            # Blit the text
+            screen.blit(text, text_pos)
 
     def __init__(self):
-        # Initialize the title text surface
-        self.title_text_surface = title_text_font.render("TicTacDota", 1,
-            BLACK)
-        # Initialize all the other text surfaces
-        self.play_timbersaw_surface = menu_text_font.render("Play against" +
-            " Timbersaw", True, BLACK)
-        self.play_stormspirit_surface = menu_text_font.render("Play against" +
-            " Storm Spirit", True, BLACK)
-        self.play_self_surface = menu_text_font.render("Play against yourself",
-            True, BLACK)
-        self.exit_text_surface = menu_text_font.render("Exit", True, BLACK)
+        # Initialize the list of text strings
+        self.text_strings = ("Play against Timbersaw",
+                "Play against Storm Spirit", "Play against yourself",
+                "Exit")
+        # Initialize the special positions
+        self.menu_height = ((menu_text_font.get_height() + 8) *
+                len(self.text_strings))
+        self.start_y = background.get_height() / 2 - self.menu_height / 2
+        self.text_positions = list()
+        # Initialize the list of surfaces
+        self.text_surfaces = list()
+        for entry in self.text_strings:
+            surface = menu_text_font.render(entry, 1, BLACK)
+            self.text_surfaces.append(surface)
 
 def play_music(music_path):
     """
@@ -110,19 +119,24 @@ def main():
     # set to the main menu.
     current_game_screen = "main"
 
-    # Initialize the game background
-    bg_surface = pygame.image.load(os.path.join("images", "bg_main.png"))
-    # Blit the game background
-    screen.blit(bg_surface, (0,0))
-
     # Start the background music
     pygame.mixer.init()
-    play_music(os.path.join(MUSIC_DIR, "monokuma.ogg"))
+    #play_music(os.path.join(MUSIC_DIR, "monokuma.ogg"))
+
+    # Initialize the sound used for clicks
+    #click_sound = pygame.mixer.Sound(os.path.join("sound", "click.ogg"))
+    # DEBUG: Print the sound path
+    #print("Click sound loaded from: " + os.path.join("sound", "click.ogg"))
 
     # Start the main game loop
     while 1:
         # Check if we are in the main menu
         if current_game_screen == "main":
+            # Initialize the game background
+            bg_surface = pygame.image.load(os.path.join("images", 
+                "bg_main.png"))
+            # Blit the game background
+            screen.blit(bg_surface, (0,0))
             # Create a main menu object
             main_menu = MainMenu()
             main_menu.draw()
@@ -132,6 +146,22 @@ def main():
             if event.type == QUIT:
                 # User wants to quit
                 sys.exit(0)
+            elif event.type == MOUSEBUTTONDOWN:
+                # Evaluate the mouse click
+                # Get the position of the mouse click
+                eventX = event.pos[0]
+                eventY = event.pos[1]
+                if current_game_screen == "main":
+                    # We are in the main screen, evaluate main screen clicks
+                    for pos in main_menu.text_positions:
+                        if((eventX > pos.left and eventX < pos.right) and
+                                (eventY > pos.top and eventY < pos.bottom)):
+                            # DEBUG: Display a console message
+                            print("Clicked " +
+                                    main_menu.text_strings[main_menu.text_positions.
+                                        index(pos)])
+                            # Play a sound
+                            #click_sound.play()
         
         # Update everything
         pygame.display.flip()
