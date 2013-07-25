@@ -12,15 +12,22 @@
 import os, random, pygame, sys
 from pygame.locals import *
 
+# Import game modules
+from ai_timbersaw import *
+from tictactoe_game import *
+
 # Important constants
 FPS = 30 # speed of the game
 WINDOWWIDTH = 640 # width of the game window, in pixels
 WINDOWHEIGHT = 480 # height of the game window, in pixels
 
-# Directory constants
+# Directory and path constants
 MUSIC_DIR = os.path.join("sounds", "music")
+ARIAL_PATH = os.path.join(".", "arial.ttf")
 
 # Color constants (R,G,B)
+BLACK = (0,0,0)
+WHITE = (255,255,255)
 GRAY = (100,100,100)
 RED = (255,0,0)
 GREEN = (0,255,0)
@@ -29,17 +36,52 @@ BLUE = (0,0,255)
 # Initialize Pygame and its window
 pygame.init()
 pygame.font.init()
-title_text_font = pygame.font.Font(os.path.join(".", "arial.ttf"), 32)
+
+# Important global variables
+# Fonts
+title_text_font = pygame.font.Font(ARIAL_PATH, 40)
+menu_text_font = pygame.font.Font(ARIAL_PATH, 28)
+
+# Window, display and main screen
 window = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
 pygame.display.set_caption('TicTacDota')
 screen = pygame.display.get_surface()
+
+class MainMenu():
+    """
+    The main menu screen.
+    """
+    def draw(self):
+        """
+        Draw the main menu.
+        """
+        # Blit the title text surface into the screen
+        screen.blit(self.title_text_surface, (200, 60))
+        # Blit all the other text surfaces onto the screen
+        screen.blit(self.play_timbersaw_surface, (150, 180))
+        screen.blit(self.play_stormspirit_surface, (150, 240))
+        screen.blit(self.play_self_surface, (150, 300))
+        screen.blit(self.exit_text_surface, (150, 360))
+
+    def __init__(self):
+        # Initialize the title text surface
+        self.title_text_surface = title_text_font.render("TicTacDota", 1,
+            WHITE)
+        # Initialize all the other text surfaces
+        self.play_timbersaw_surface = menu_text_font.render("Play against" +
+            " Timbersaw", True, WHITE)
+        self.play_stormspirit_surface = menu_text_font.render("Play against" +
+            " Storm Spirit", True, WHITE)
+        self.play_self_surface = menu_text_font.render("Play against yourself",
+            True, WHITE)
+        self.exit_text_surface = menu_text_font.render("Exit", True, WHITE)
 
 def play_music(music_path):
     """
     Loads the music path passed as an argument and plays it.
     """
     # DEBUG: Display the music path
-    print(music_path)
+    print("Loaded music: " + music_path)
 
     # Play the background music
     pygame.mixer.music.load(music_path)
@@ -64,17 +106,21 @@ def main():
     """
     print("Initializing TicTacDota...")
 
+    # Create a variable to check which game screen we are in. It is initially
+    # set to the main menu.
+    current_game_screen = "main"
+
     # Start the background music
     pygame.mixer.init()
     play_music(os.path.join(MUSIC_DIR, "monokuma.ogg"))
 
     # Start the main game loop
     while 1:
-        # DEBUG: Draw the face of timbersaw
-        draw_timbersaw(0, 0)
-        # DEBUG: Draw some text
-        text_surface = title_text_font.render("I'm Timbersaw!", 0, RED)
-        screen.blit(text_surface, (320, 20))
+        # Check if we are in the main menu
+        if current_game_screen == "main":
+            # Create a main menu object
+            main_menu = MainMenu()
+            main_menu.draw()
 
         # Event handler
         for event in (pygame.event.get()):
