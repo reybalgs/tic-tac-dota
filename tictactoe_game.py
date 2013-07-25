@@ -25,6 +25,19 @@ class TicTacToe():
                 'middleleft':'-', 'middlecenter':'-', 'middleright':'-',
                 'bottomleft':'-', 'bottomcenter':'-', 'bottomright':'-'}
 
+    def display_board(self):
+        """
+        Displays an ASCII representation of the board. Useful for debugging
+        without the UI.
+        """
+        print('\n')
+        print(self.board['topleft'] + self.board['topcenter'] +
+              self.board['topright'])
+        print(self.board['middleleft'] + self.board['middlecenter']
+              + self.board['middleright'])
+        print(self.board['bottomleft'] + self.board['bottomcenter']
+              + self.board['bottomright'])
+
     def clear_board(self):
         """
         Clears the game board, removing all marks made by the players
