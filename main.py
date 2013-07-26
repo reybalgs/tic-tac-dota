@@ -43,6 +43,7 @@ menu_text_font = pygame.font.Font(ARIAL_PATH, 36)
 
 # Positions
 main_menu_text_pos = list()
+grid_start = (160, 40)
 
 # Window, display and main screen
 window = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
