@@ -18,7 +18,7 @@ from ai_stormspirit import *
 from tictactoe_game import *
 
 # Important constants
-FPS = 15 # speed of the game
+FPS = 25 # speed of the game
 WINDOWWIDTH = 640 # width of the game window, in pixels
 WINDOWHEIGHT = 480 # height of the game window, in pixels
 
@@ -136,6 +136,11 @@ class GameScreen():
             screen.blit(self.mark_x, (370,250))
         elif game.board['bottomright'] == 'o':
             screen.blit(self.mark_o, (370,250))
+        # Display winning messages, if any
+        if game.check_winner('x'):
+            screen.blit(self.player_lose, (5, 5))
+        elif game.check_winner('o'):
+            screen.blit(self.player_win, (5, 5))
 
     def __init__(self, opponent, game):
         """
@@ -183,13 +188,16 @@ class GameScreen():
             1, BLUE)
         # Initialize the quit text.
         self.quit = menu_text_font.render("Quit?", 1, BLACK)
+        # Initialize the win message for the player
+        self.player_win = name_text_font.render("You win!", 1, RED)
+        # Initialize the lose message for the player
+        self.player_lose = name_text_font.render(opponent.capitalize() + 
+            " wins!", 1, BLUE)
         # Initialize the marks on the game board.
         self.mark_x = pygame.transform.smoothscale(pygame.image.load(
             os.path.join("images", "cross.png")), (80,80))
         self.mark_o = pygame.transform.smoothscale(pygame.image.load(
             os.path.join("images", "circle.png")), (80,80))
-
-        print('Rendering visual board')
 
 class MainMenu():
     """
@@ -368,7 +376,7 @@ def main():
                                 moved = 1
 
         # Game flow controller
-        if not game.check_winner('x') and not game.check_winner('o'):
+        if not (game.check_winner('x') or game.check_winner('o')):
             # There is still no winner in the game.
             # Keep going with the game flow.
             if moved:
@@ -381,12 +389,26 @@ def main():
                     storm_spirit.move(game.board)
                 # Reset the moved flag
                 moved = 0
+                # Display a CLI view of the board
+                game.display_board()
         else:
             # Increment the winner's score.
             if game.check_winner('x'):
                 game.opponent_score += 1
             elif game.check_winner('o'):
                 game.player_score += 1
+            # Reset the moved flag
+            moved = 0
+            pygame.display.flip()
+            # Put a 3 sec delay
+            pygame.time.wait(1500)
+            # Reset the board
+            game.clear_board()
+
+        # Check if the board is full, reset if necessary
+        if game.is_board_full():
+            pygame.time.wait(1500)
+            game.clear_board()
         
         # Update everything
         pygame.display.flip()
