@@ -50,6 +50,19 @@ score_text_font = pygame.font.Font(ARIAL_PATH, 60)
 # Positions
 main_menu_text_pos = list()
 grid_start = (160, 40)
+# Generate grid rects
+location_rects = list()
+location_names = ['topleft', 'topcenter', 'topright', 'middleleft',
+'middlecenter', 'middleright', 'bottomleft', 'bottomcenter', 'bottomright']
+location_rects.append(pygame.Rect(160, 40, 100, 100))
+location_rects.append(pygame.Rect(260, 40, 100, 100))
+location_rects.append(pygame.Rect(360, 40, 100, 100))
+location_rects.append(pygame.Rect(160, 140, 100, 100))
+location_rects.append(pygame.Rect(260, 140, 100, 100))
+location_rects.append(pygame.Rect(360, 140, 100, 100))
+location_rects.append(pygame.Rect(160, 240, 100, 100))
+location_rects.append(pygame.Rect(260, 240, 100, 100))
+location_rects.append(pygame.Rect(360, 240, 100, 100))
 
 # Window, display and main screen
 window = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
@@ -67,6 +80,9 @@ class GameScreen():
         """
         Draws the game board. Takes data from the TicTacToe game class.
         """
+        # A variable to track which location we are in.
+        location = 1
+
         # Draw the background image
         screen.blit(self.bg_image, (0,0))
         # Draw the player's portrait image
@@ -80,9 +96,46 @@ class GameScreen():
         # Draw the player's score text
         screen.blit(self.player_score, (120, (480 - 80)))
         # Draw the opponent's score text
-        screen.blit(self.opponent_score, (480, (480 - 80)))
+        screen.blit(self.opponent_score, (420, (480 - 80)))
         # Draw the quit text
         screen.blit(self.quit, (520, 10))
+        # Draw the marks on the game board.
+        if game.board['topleft'] == 'x':
+            screen.blit(self.mark_x, (170,50))
+        elif game.board['topleft'] == 'o':
+            screen.blit(self.mark_o, (170,50))
+        if game.board['topcenter'] == 'x':
+            screen.blit(self.mark_x, (270,50))
+        elif game.board['topcenter'] == 'o':
+            screen.blit(self.mark_o, (270,50))
+        if game.board['topright'] == 'x':
+            screen.blit(self.mark_x, (370,50))
+        elif game.board['topright'] == 'o':
+            screen.blit(self.mark_o, (370,50))
+        if game.board['middleleft'] == 'x':
+            screen.blit(self.mark_x, (170,150))
+        elif game.board['middleleft'] == 'o':
+            screen.blit(self.mark_o, (170,150))
+        if game.board['middlecenter'] == 'x':
+            screen.blit(self.mark_x, (270,150))
+        elif game.board['middlecenter'] == 'o':
+            screen.blit(self.mark_o, (270,150))
+        if game.board['middleright'] == 'x':
+            screen.blit(self.mark_x, (370,150))
+        elif game.board['middleright'] == 'o':
+            screen.blit(self.mark_o, (370,150))
+        if game.board['bottomleft'] == 'x':
+            screen.blit(self.mark_x, (170,250))
+        elif game.board['bottomleft'] == 'o':
+            screen.blit(self.mark_o, (170,250))
+        if game.board['bottomcenter'] == 'x':
+            screen.blit(self.mark_x, (270,250))
+        elif game.board['bottomcenter'] == 'o':
+            screen.blit(self.mark_o, (270,250))
+        if game.board['bottomright'] == 'x':
+            screen.blit(self.mark_x, (370,250))
+        elif game.board['bottomright'] == 'o':
+            screen.blit(self.mark_o, (370,250))
 
     def __init__(self, opponent, game):
         """
@@ -130,6 +183,12 @@ class GameScreen():
             1, BLUE)
         # Initialize the quit text.
         self.quit = menu_text_font.render("Quit?", 1, BLACK)
+        # Initialize the marks on the game board.
+        self.mark_x = pygame.transform.smoothscale(pygame.image.load(
+            os.path.join("images", "cross.png")), (80,80))
+        self.mark_o = pygame.transform.smoothscale(pygame.image.load(
+            os.path.join("images", "circle.png")), (80,80))
+
         print('Rendering visual board')
 
 class MainMenu():
@@ -206,9 +265,9 @@ def main():
     #play_music(os.path.join(MUSIC_DIR, "monokuma.ogg"))
 
     # Initialize the sound used for clicks
-    #click_sound = pygame.mixer.Sound(os.path.join("sound", "click.ogg"))
+    click_sound = pygame.mixer.Sound(os.path.join("sound", "click.ogg"))
     # DEBUG: Print the sound path
-    #print("Click sound loaded from: " + os.path.join("sound", "click.ogg"))
+    print("Click sound loaded from: " + os.path.join("sound", "click.ogg"))
 
     # Initialize the Timbersaw and Storm Spirit AIs
     timbersaw = Timbersaw()
@@ -217,8 +276,23 @@ def main():
     # Initialize the game board
     game = TicTacToe()
 
+    # A boolean variable to check whether the player has made their move or not
+    moved = 0
+
+    # DEBUG: Constant testing values
+    #game.board['topleft'] = 'x'
+    #game.board['topcenter'] = 'o'
+    #game.board['topright'] = 'x'
+    #game.board['middleleft'] = 'o'
+    #game.board['middlecenter'] = 'x'
+    #game.board['middleright'] = 'o'
+    #game.board['bottomleft'] = 'x'
+    #game.board['bottomcenter'] = 'o'
+    #game.board['bottomright'] = 'x'
+
     # Start the main game loop
     while 1:
+        # Drawing stuff
         # Check if we are in the main menu
         if current_game_screen == "main":
             # Initialize the game background
@@ -273,7 +347,46 @@ def main():
                                 current_game_screen = "self"
                             print('Screen changed to ' + current_game_screen)
                             # Play a sound
-                            #click_sound.play()
+                            click_sound.play()
+                elif(current_game_screen == 'timbersaw' or current_game_screen
+                        == 'storm_spirit'):
+                    # Check whether we have pressed one of the tiles in the
+                    # grid
+                    for location_rect in location_rects:
+                        if((eventX > location_rect.left and eventX <
+                                location_rect.right) and (eventY >
+                                location_rect.top and eventY <
+                                location_rect.bottom)):
+                            # We have clicked one of the locations
+                            if(game.board[location_names[location_rects.
+                                    index(location_rect)]] == '-'):
+                                # The location is empty, let's mark it with the
+                                # player's mark
+                                game.board[location_names[location_rects.
+                                    index(location_rect)]] = 'o'
+                                # Set the player's 'moved' flag
+                                moved = 1
+
+        # Game flow controller
+        if not game.check_winner('x') and not game.check_winner('o'):
+            # There is still no winner in the game.
+            # Keep going with the game flow.
+            if moved:
+                # Player has made their move, the other player should make
+                # their move now.
+                # Let's check who the opponent is.
+                if current_game_screen == 'timbersaw':
+                    timbersaw.move(game.board)
+                elif current_game_screen == 'storm_spirit':
+                    storm_spirit.move(game.board)
+                # Reset the moved flag
+                moved = 0
+        else:
+            # Increment the winner's score.
+            if game.check_winner('x'):
+                game.opponent_score += 1
+            elif game.check_winner('o'):
+                game.player_score += 1
         
         # Update everything
         pygame.display.flip()
