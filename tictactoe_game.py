@@ -24,6 +24,8 @@ class TicTacToe():
         self.board = {'topleft':'-', 'topcenter':'-', 'topright':'-',
                 'middleleft':'-', 'middlecenter':'-', 'middleright':'-',
                 'bottomleft':'-', 'bottomcenter':'-', 'bottomright':'-'}
+        self.player_score = 0
+        self.opponent_score = 0
 
     def display_board(self):
         """
@@ -37,6 +39,13 @@ class TicTacToe():
               + self.board['middleright'])
         print(self.board['bottomleft'] + self.board['bottomcenter']
               + self.board['bottomright'])
+
+    def reset_scores(self):
+        """
+        Resets the scores of the player and the opponent.
+        """
+        self.player_score = 0
+        self.opponent_score = 0
 
     def clear_board(self):
         """

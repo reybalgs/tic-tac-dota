@@ -14,10 +14,11 @@ from pygame.locals import *
 
 # Import game modules
 from ai_timbersaw import *
+from ai_stormspirit import *
 from tictactoe_game import *
 
 # Important constants
-FPS = 30 # speed of the game
+FPS = 15 # speed of the game
 WINDOWWIDTH = 640 # width of the game window, in pixels
 WINDOWHEIGHT = 480 # height of the game window, in pixels
 
@@ -37,9 +38,14 @@ BLUE = (0,0,255)
 pygame.init()
 pygame.font.init()
 
+# A game clock
+clock = pygame.time.Clock()
+
 # Important global variables
 # Fonts
 menu_text_font = pygame.font.Font(ARIAL_PATH, 36)
+name_text_font = pygame.font.Font(ARIAL_PATH, 28)
+score_text_font = pygame.font.Font(ARIAL_PATH, 60)
 
 # Positions
 main_menu_text_pos = list()
@@ -50,6 +56,81 @@ window = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
 pygame.display.set_caption('TicTacDota')
 screen = pygame.display.get_surface()
 background = pygame.Surface(screen.get_size())
+
+class GameScreen():
+    """
+    Class defining the visual logic of the tictactoe game. All the game logic
+    is defined in the tictactoe_game.py file, in the TicTacToe() class.
+    """
+
+    def draw(self, game):
+        """
+        Draws the game board. Takes data from the TicTacToe game class.
+        """
+        # Draw the background image
+        screen.blit(self.bg_image, (0,0))
+        # Draw the player's portrait image
+        screen.blit(self.player_portrait, (0,(480 - 130)))
+        # Draw the opponent's portrait image
+        screen.blit(self.opponent_portrait, ((640 - 110),(480 - 130)))
+        # Draw the player's name text
+        screen.blit(self.player_name, (120, (480 - 130)))
+        # Draw the opponent's name text
+        screen.blit(self.opponent_name, (360, (480 - 130)))
+        # Draw the player's score text
+        screen.blit(self.player_score, (120, (480 - 80)))
+        # Draw the opponent's score text
+        screen.blit(self.opponent_score, (480, (480 - 80)))
+        # Draw the quit text
+        screen.blit(self.quit, (520, 10))
+
+    def __init__(self, opponent, game):
+        """
+        Initialization function.
+
+        Arguments:
+        opponent = string that states the opponent of the player. Can either
+        be "timbersaw", "storm_spirit" or "self".
+        game = a TicTacToe() object, containing the game logic.
+        """
+        # Initialize the background image
+        self.bg_image = pygame.image.load(os.path.join("images",
+            "bg_game.png"))
+        # Initialize the player's portrait image
+        self.player_portrait = pygame.image.load(os.path.join("images",
+            "player.jpg"))
+        # Initialize the opponent's portrait image, depending on the opponent
+        # argument passed.
+        if opponent == 'timbersaw':
+            self.opponent_portrait = pygame.image.load(os.path.join("images",
+                "timbersaw.jpg"))
+        elif opponent == 'storm_spirit':
+            self.opponent_portrait = pygame.image.load(os.path.join("images",
+                "storm_spirit.jpg"))
+        elif opponent == 'self':
+            self.opponent_portrait = pygame.image.load(os.path.join("images",
+                "player.jpg"))
+        # Make the opponent's image smaller
+        self.opponent_portrait = pygame.transform.smoothscale(
+            self.opponent_portrait, (110, 130))
+        # Transform the dimensions of the player's portrait so that it is equal
+        # to the size of the opponent's.
+        self.player_portrait = pygame.transform.smoothscale(
+            self.player_portrait, self.opponent_portrait.get_size())
+        # Initialize the player's name text.
+        self.player_name = name_text_font.render("The Player", 1, BLACK)
+        # Initialize the opponent's name text, depending on the opponent
+        self.opponent_name = name_text_font.render(opponent.capitalize(),
+            1, BLACK)
+        # Initialize the player's score text.
+        self.player_score = score_text_font.render(str(game.player_score),
+            1, RED)
+        # Initialize the opponent's score text.
+        self.opponent_score = score_text_font.render(str(game.opponent_score),
+            1, BLUE)
+        # Initialize the quit text.
+        self.quit = menu_text_font.render("Quit?", 1, BLACK)
+        print('Rendering visual board')
 
 class MainMenu():
     """
@@ -129,6 +210,13 @@ def main():
     # DEBUG: Print the sound path
     #print("Click sound loaded from: " + os.path.join("sound", "click.ogg"))
 
+    # Initialize the Timbersaw and Storm Spirit AIs
+    timbersaw = Timbersaw()
+    storm_spirit = StormSpirit()
+
+    # Initialize the game board
+    game = TicTacToe()
+
     # Start the main game loop
     while 1:
         # Check if we are in the main menu
@@ -141,6 +229,11 @@ def main():
             # Create a main menu object
             main_menu = MainMenu()
             main_menu.draw()
+        elif current_game_screen == 'timbersaw':
+            # The player wanted to play against timbersaw
+            # Draw the game screen
+            game_screen = GameScreen(current_game_screen, game)
+            game_screen.draw(game)
 
         # Event handler
         for event in (pygame.event.get()):
@@ -159,13 +252,34 @@ def main():
                                 (eventY > pos.top and eventY < pos.bottom)):
                             # DEBUG: Display a console message
                             print("Clicked " +
-                                    main_menu.text_strings[main_menu.text_positions.
-                                        index(pos)])
+                                main_menu.text_strings[main_menu.text_positions.
+                                index(pos)])
+                            # Change the current screen according to the option
+                            # chosen
+                            if(main_menu.text_strings[main_menu.
+                                    text_positions.index(pos)] ==
+                                    main_menu.text_strings[0]):
+                                # User chose to play against Timbersaw
+                                current_game_screen = "timbersaw"
+                            elif(main_menu.text_strings[main_menu.
+                                   text_positions.index(pos)] ==
+                                   main_menu.text_strings[1]):
+                                # User chose to play against Storm Spirit
+                                current_game_screen = "storm_spirit"
+                            elif(main_menu.text_strings[main_menu.
+                                    text_positions.index(pos)] ==
+                                    main_menu.text_strings[2]):
+                                # User chose to play against himself
+                                current_game_screen = "self"
+                            print('Screen changed to ' + current_game_screen)
                             # Play a sound
                             #click_sound.play()
         
         # Update everything
         pygame.display.flip()
+
+        # Tick the clock
+        clock.tick(FPS)
 
 if __name__ == '__main__':
     main()
