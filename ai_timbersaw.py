@@ -177,68 +177,73 @@ class Timbersaw():
         Also requires the player's mark as a parameter. This is 'o' by
         default.  
         """
-        # First, the AI has to check whether the player has formed a line.
-        # The AI does this by analyzing all the marks that the player has
-        # created.
-        
-        # Initialize a move variable that determines the location that the AI
-        # will mark
-        move = ''
+        # First thing's first, let's check if the board is actually full
+        # before moving
+        full = 1
+        for location in board.keys():
+            if board[location] == '-':
+                full = 0
 
-        # Look for any attempts of the player to create a line, and find the
-        # best location to mark in order to block that attempt
-        print('Looking for opponent line attempts...')
-        move = self.find_line_attempt(board)
+        if not full:
+            # First, the AI has to check whether the player has formed a
+            # line.  The AI does this by analyzing all the marks that the
+            # player has created.
+            
+            # Initialize a move variable that determines the location that
+            # the AI will mark
+            move = ''
 
-        # Now let's check if we actually found any attempts
-        if(move == ''):
-            # Let's check if we can find one of our own line attempts. If there
-            # are any, we will mark that location
-            print('No opponent line attempts found. Will now check for self' +
-                    ' line attempts to follow up')
-            move = self.find_line_attempt(board, 'x')
+            # Look for any attempts of the player to create a line, and find
+            # the best location to mark in order to block that attempt
+            print('Looking for opponent line attempts...')
+            move = self.find_line_attempt(board)
 
+            # Now let's check if we actually found any attempts
             if(move == ''):
-                print('No self line attempts found. Will now mark random ' +
-                        'location')
-                # If we have found none, then randomly pick an unoccupied
-                # spot to mark
-                marked = 0
-                while marked == 0:
-                    location = random.randint(1,9)
-                    # The location will have to be empty
-                    if(location == 1 and board['topleft'] == '-'):
-                        marked = 1
-                        print('Marking topleft location\n')
-                    elif(location == 2 and board['topcenter'] == '-'):
-                        marked = 1
-                        print('Marking topcenter location\n')
-                    elif(location == 3 and board['topright'] == '-'):
-                        marked = 1
-                        print('Marking topright location\n')
-                    elif(location == 4 and board['middleleft'] == '-'):
-                        marked = 1
-                        print('Marking middleleft location\n')
-                    elif(location == 5 and board['middlecenter'] == '-'):
-                        marked = 1
-                        print('Marking middlecenter location\n')
-                    elif(location == 6 and board['middleright'] == '-'):
-                        marked = 1
-                        print('Marking middleright location\n')
-                    elif(location == 7 and board['bottomleft'] == '-'):
-                        marked = 1
-                        print('Marking bottomleft location\n')
-                    elif(location == 8 and board['bottomcenter'] == '-'):
-                        marked = 1
-                        print('Marking bottomcenter location\n')
-                    elif(location == 9 and board['bottomright'] == '-'):
-                        marked = 1
-                        print('Marking bottomright location\n')
-                    else:
-                        # There are no more locations to mark, but set marked to
-                        # true anyway
-                        marked = 1
-                        print('No empty spaces found!')
+                # Let's check if we can find one of our own line attempts. If
+                # there are any, we will mark that location
+                print('No opponent line attempts found. Will now check for' +
+                        ' self line attempts to follow up')
+                move = self.find_line_attempt(board, 'x')
+
+                if(move == ''):
+                    print('No self line attempts found. Will now mark random '
+                            + 'location')
+                    # If we have found none, then randomly pick an unoccupied
+                    # spot to mark
+                    marked = 0
+                    while marked == 0:
+                        location = random.randint(1,9)
+                        # The location will have to be empty
+                        if(location == 1 and board['topleft'] == '-'):
+                            marked = 1
+                            print('Marking topleft location\n')
+                        elif(location == 2 and board['topcenter'] == '-'):
+                            marked = 1
+                            print('Marking topcenter location\n')
+                        elif(location == 3 and board['topright'] == '-'):
+                            marked = 1
+                            print('Marking topright location\n')
+                        elif(location == 4 and board['middleleft'] == '-'):
+                            marked = 1
+                            print('Marking middleleft location\n')
+                        elif(location == 5 and board['middlecenter'] == '-'):
+                            marked = 1
+                            print('Marking middlecenter location\n')
+                        elif(location == 6 and board['middleright'] == '-'):
+                            marked = 1
+                            print('Marking middleright location\n')
+                        elif(location == 7 and board['bottomleft'] == '-'):
+                            marked = 1
+                            print('Marking bottomleft location\n')
+                        elif(location == 8 and board['bottomcenter'] == '-'):
+                            marked = 1
+                            print('Marking bottomcenter location\n')
+                        elif(location == 9 and board['bottomright'] == '-'):
+                            marked = 1
+                            print('Marking bottomright location\n')
+                        else:
+                            print('No location found! Re-rolling...')
                     # Mark the location chosen
                     if(location == 1):
                         board['topleft'] = self.mark
@@ -258,19 +263,20 @@ class Timbersaw():
                         board['bottomcenter'] = self.mark
                     elif(location == 9):
                         board['bottomright'] = self.mark
+                else:
+                    # Mark the location
+                    board[move] = self.mark
+                    print('Marked location at ' + move)
             else:
                 # Mark the location
                 board[move] = self.mark
                 print('Marked location at ' + move)
-        else:
-            # Mark the location
-            board[move] = self.mark
-            print('Marked location at ' + move)
 
     def __init__(self, mark='x'):
         """
         Default initializing constructor.
         """
         # Set the mark of the AI to the specified argument
+        self.name = 'Timbersaw'
         self.mark = mark
         print('AI Timbersaw (Cautious) initialized')

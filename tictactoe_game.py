@@ -27,12 +27,92 @@ class TicTacToe():
         self.player_score = 0
         self.opponent_score = 0
 
+    def get_location_key(self, location_num):
+        """
+        Evaluates the location integer specified and returns the key pertaining
+        to the location.
+        """
+        if location_num == 1:
+            return 'topleft'
+        elif location_num == 2:
+            return 'topcenter'
+        elif location_num == 3:
+            return 'topright'
+        elif location_num == 4:
+            return 'middleleft'
+        elif location_num == 5:
+            return 'middlecenter'
+        elif location_num == 6:
+            return 'middleright'
+        elif location_num == 7:
+            return 'bottomleft'
+        elif location_num == 8:
+            return 'bottomcenter'
+        elif location_num == 9:
+            return 'bottomright'
+
+    def is_location_occupied(self, location_num):
+        """
+        Checks if the specified location integer is occupied or not. Returns
+        either true or false.
+
+        Take note that the locations are defined as follows:
+        
+        1|2|3
+        4|5|6
+        7|8|9
+        """
+        if(location_num == 1):
+            if(self.board['topleft'] != '-'):
+                return True
+            else:
+                return False
+        elif(location_num == 2):
+            if(self.board['topcenter'] != '-'):
+                return True
+            else:
+                return False
+        elif(location_num == 3):
+            if(self.board['topright'] != '-'):
+                return True
+            else:
+                return False
+        elif(location_num == 4):
+            if(self.board['middleleft'] != '-'):
+                return True
+            else:
+                return False
+        elif(location_num == 5):
+            if(self.board['middlecenter'] != '-'):
+                return True
+            else:
+                return False
+        elif(location_num == 6):
+            if(self.board['middleright'] != '-'):
+                return True
+            else:
+                return False
+        elif(location_num == 7):
+            if(self.board['bottomleft'] != '-'):
+                return True
+            else:
+                return False
+        elif(location_num == 8):
+            if(self.board['bottomcenter'] != '-'):
+                return True
+            else:
+                return False
+        elif(location_num == 9):
+            if(self.board['bottomright'] != '-'):
+                return True
+            else:
+                return False
+
     def display_board(self):
         """
         Displays an ASCII representation of the board. Useful for debugging
         without the UI.
         """
-        print('\n')
         print(self.board['topleft'] + self.board['topcenter'] +
               self.board['topright'])
         print(self.board['middleleft'] + self.board['middlecenter']
