@@ -137,10 +137,12 @@ class GameScreen():
         elif game.board['bottomright'] == 'o':
             screen.blit(self.mark_o, (370,250))
         # Display winning messages, if any
+        if game.check_winner('o'):
+            #screen.blit(self.player_lose, (5, 5))
+            screen.blit(self.player_win, (5, 5))
         if game.check_winner('x'):
             screen.blit(self.player_lose, (5, 5))
-        elif game.check_winner('o'):
-            screen.blit(self.player_win, (5, 5))
+            #screen.blit(self.player_win, (5, 5))
 
     def __init__(self, opponent, game):
         """
@@ -178,8 +180,12 @@ class GameScreen():
         # Initialize the player's name text.
         self.player_name = name_text_font.render("The Player", 1, BLACK)
         # Initialize the opponent's name text, depending on the opponent
-        self.opponent_name = name_text_font.render(opponent.capitalize(),
-            1, BLACK)
+        if opponent == 'storm_spirit':
+            self.opponent_name = name_text_font.render("Storm Spirit", 1,
+                BLACK)
+        else:
+            self.opponent_name = name_text_font.render(opponent.capitalize(),
+                1, BLACK)
         # Initialize the player's score text.
         self.player_score = score_text_font.render(str(game.player_score),
             1, RED)
@@ -191,8 +197,12 @@ class GameScreen():
         # Initialize the win message for the player
         self.player_win = name_text_font.render("You win!", 1, RED)
         # Initialize the lose message for the player
-        self.player_lose = name_text_font.render(opponent.capitalize() + 
-            " wins!", 1, BLUE)
+        if opponent == 'storm_spirit':
+            self.player_lose = name_text_font.render("Storm Spirit wins!",
+                1, BLUE)
+        else:
+            self.player_lose = name_text_font.render(opponent.capitalize() + 
+                " wins!", 1, BLUE)
         # Initialize the marks on the game board.
         self.mark_x = pygame.transform.smoothscale(pygame.image.load(
             os.path.join("images", "cross.png")), (80,80))
@@ -313,6 +323,11 @@ def main():
             main_menu.draw()
         elif current_game_screen == 'timbersaw':
             # The player wanted to play against timbersaw
+            # Draw the game screen
+            game_screen = GameScreen(current_game_screen, game)
+            game_screen.draw(game)
+        elif current_game_screen == 'storm_spirit':
+            # The player wanted to play against Storm Spirit
             # Draw the game screen
             game_screen = GameScreen(current_game_screen, game)
             game_screen.draw(game)
