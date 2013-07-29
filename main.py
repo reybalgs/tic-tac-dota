@@ -50,6 +50,7 @@ score_text_font = pygame.font.Font(ARIAL_PATH, 60)
 # Positions
 main_menu_text_pos = list()
 grid_start = (160, 40)
+quit_rect = Rect(520,10,80,60)
 # Generate grid rects
 location_rects = list()
 location_names = ['topleft', 'topcenter', 'topright', 'middleleft',
@@ -297,6 +298,9 @@ def main():
     # A boolean variable to check whether the player has made their move or not
     moved = 0
 
+    # A boolean variable to check whether the player wanted to quit
+    quit = 0
+
     # DEBUG: Constant testing values
     #game.board['topleft'] = 'x'
     #game.board['topcenter'] = 'o'
@@ -373,52 +377,67 @@ def main():
                             click_sound.play()
                 elif(current_game_screen == 'timbersaw' or current_game_screen
                         == 'storm_spirit'):
-                    # Check whether we have pressed one of the tiles in the
-                    # grid
-                    for location_rect in location_rects:
-                        if((eventX > location_rect.left and eventX <
-                                location_rect.right) and (eventY >
-                                location_rect.top and eventY <
-                                location_rect.bottom)):
-                            # We have clicked one of the locations
-                            if(game.board[location_names[location_rects.
-                                    index(location_rect)]] == '-'):
-                                # The location is empty, let's mark it with the
-                                # player's mark
-                                game.board[location_names[location_rects.
-                                    index(location_rect)]] = 'o'
-                                # Set the player's 'moved' flag
-                                moved = 1
+                    # Check whether we have pressed quit
+                    if((eventX > quit_rect.left and eventX <
+                            quit_rect.right) and (eventY > quit_rect.top and
+                            eventY < quit_rect.bottom)):
+                        quit = 1
+                        current_game_screen = "main"
+                    else:
+                        # Check whether we have pressed one of the tiles in the
+                        # grid
+                        for location_rect in location_rects:
+                            if((eventX > location_rect.left and eventX <
+                                    location_rect.right) and (eventY >
+                                    location_rect.top and eventY <
+                                    location_rect.bottom)):
+                                # We have clicked one of the locations
+                                if(game.board[location_names[location_rects.
+                                        index(location_rect)]] == '-'):
+                                    # The location is empty, let's mark it with
+                                    # the player's mark
+                                    game.board[location_names[location_rects.
+                                        index(location_rect)]] = 'o'
+                                    # Set the player's 'moved' flag
+                                    moved = 1
 
-        # Game flow controller
-        if not (game.check_winner('x') or game.check_winner('o')):
-            # There is still no winner in the game.
-            # Keep going with the game flow.
-            if moved:
-                # Player has made their move, the other player should make
-                # their move now.
-                # Let's check who the opponent is.
-                if current_game_screen == 'timbersaw':
-                    timbersaw.move(game.board)
-                elif current_game_screen == 'storm_spirit':
-                    storm_spirit.move(game.board)
+        if not quit:
+            # Game flow controller
+            if not (game.check_winner('x') or game.check_winner('o')):
+                # There is still no winner in the game.
+                # Keep going with the game flow.
+                if moved:
+                    # Player has made their move, the other player should make
+                    # their move now.
+                    # Let's check who the opponent is.
+                    if current_game_screen == 'timbersaw':
+                        timbersaw.move(game.board)
+                    elif current_game_screen == 'storm_spirit':
+                        storm_spirit.move(game.board)
+                    # Reset the moved flag
+                    moved = 0
+                    # Display a CLI view of the board
+                    game.display_board()
+            else:
+                # Increment the winner's score.
+                if game.check_winner('x'):
+                    game.opponent_score += 1
+                elif game.check_winner('o'):
+                    game.player_score += 1
                 # Reset the moved flag
                 moved = 0
-                # Display a CLI view of the board
-                game.display_board()
+                pygame.display.flip()
+                # Put a 3 sec delay
+                pygame.time.wait(1500)
+                # Reset the board
+                game.clear_board()
         else:
-            # Increment the winner's score.
-            if game.check_winner('x'):
-                game.opponent_score += 1
-            elif game.check_winner('o'):
-                game.player_score += 1
-            # Reset the moved flag
+            # Player chose to quit
+            # Clear the game board
             moved = 0
-            pygame.display.flip()
-            # Put a 3 sec delay
-            pygame.time.wait(1500)
-            # Reset the board
             game.clear_board()
+            game.reset_scores()
+            quit = 0
 
         # Check if the board is full, reset if necessary
         if game.is_board_full():
