@@ -25,8 +25,6 @@ def start_game(game, ai):
         if not game.is_location_occupied(option):
             game.board[game.get_location_key(option)] = 'o'
 
-        game.display_board()
-
         if not game.check_winner('o'):
             print('AI turn')
             ai.move(game.board)

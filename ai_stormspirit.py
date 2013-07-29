@@ -70,8 +70,7 @@ class StormSpirit(Timbersaw):
                 else:
                     # There are no more locations to mark, but set marked to
                     # true anyway
-                    marked = 1
-                    print('No empty spaces found!')
+                    print('No empty spaces found! Re-rolling')
             # Mark the location chosen
             if(location == 1):
                 board['topleft'] = self.mark
@@ -102,4 +101,5 @@ class StormSpirit(Timbersaw):
         """
         # Set the mark of the AI to the argument provided
         self.mark = mark
+        self.name = 'Storm Spirit'
         print('AI Storm Spirit (Aggressive) initialized')
