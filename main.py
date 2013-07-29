@@ -535,6 +535,11 @@ def main():
         if game.is_board_full():
             pygame.time.wait(1500)
             game.clear_board()
+            # Reset the two-player variables, if necessary
+            if current_game_screen == 'self':
+                p1_moved = 0
+                p2_moved = 0
+                p1_turn = 1
         
         # Update everything
         pygame.display.flip()
