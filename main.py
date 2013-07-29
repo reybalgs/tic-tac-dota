@@ -372,6 +372,11 @@ def main():
                                     main_menu.text_strings[2]):
                                 # User chose to play against himself
                                 current_game_screen = "self"
+                            elif(main_menu.text_strings[main_menu.
+                                    text_positions.index(pos)] == main_menu.
+                                    text_strings[3]):
+                                # User chose to quit
+                                sys.exit(0)
                             print('Screen changed to ' + current_game_screen)
                             # Play a sound
                             click_sound.play()
