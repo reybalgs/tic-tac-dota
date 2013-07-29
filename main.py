@@ -179,14 +179,19 @@ class GameScreen():
         self.player_portrait = pygame.transform.smoothscale(
             self.player_portrait, self.opponent_portrait.get_size())
         # Initialize the player's name text.
-        self.player_name = name_text_font.render("The Player", 1, BLACK)
+        if opponent is not 'self':
+            self.player_name = name_text_font.render("The Player", 1, BLACK)
+        else:
+            self.player_name = name_text_font.render("Player 1", 1, BLACK)
         # Initialize the opponent's name text, depending on the opponent
         if opponent == 'storm_spirit':
             self.opponent_name = name_text_font.render("Storm Spirit", 1,
                 BLACK)
-        else:
+        elif opponent == 'timbersaw':
             self.opponent_name = name_text_font.render(opponent.capitalize(),
                 1, BLACK)
+        elif opponent == 'self':
+            self.opponent_name = name_text_font.render("Player 2", 1, BLACK)
         # Initialize the player's score text.
         self.player_score = score_text_font.render(str(game.player_score),
             1, RED)
@@ -196,14 +201,19 @@ class GameScreen():
         # Initialize the quit text.
         self.quit = menu_text_font.render("Quit?", 1, BLACK)
         # Initialize the win message for the player
-        self.player_win = name_text_font.render("You win!", 1, RED)
+        if opponent is not 'self':
+            self.player_win = name_text_font.render("You win!", 1, RED)
+        else:
+            self.player_win = name_text_font.render("Player 1 wins!", 1, RED)
         # Initialize the lose message for the player
         if opponent == 'storm_spirit':
             self.player_lose = name_text_font.render("Storm Spirit wins!",
                 1, BLUE)
-        else:
+        elif opponent == 'timbersaw':
             self.player_lose = name_text_font.render(opponent.capitalize() + 
                 " wins!", 1, BLUE)
+        elif opponent == 'self':
+            self.player_lose = name_text_font.render("Player 2 wins!", 1, BLUE)
         # Initialize the marks on the game board.
         self.mark_x = pygame.transform.smoothscale(pygame.image.load(
             os.path.join("images", "cross.png")), (80,80))
@@ -298,6 +308,15 @@ def main():
     # A boolean variable to check whether the player has made their move or not
     moved = 0
 
+    # Boolean variables to check if the players have made their moves or not in
+    # two player mode
+    p1_moved = 0
+    p2_moved = 0
+
+    # Boolean to check if it's the first player's turn in two player mode,
+    # false just means that it's the other player's turn.
+    p1_turn = 1
+
     # A boolean variable to check whether the player wanted to quit
     quit = 0
 
@@ -332,6 +351,11 @@ def main():
             game_screen.draw(game)
         elif current_game_screen == 'storm_spirit':
             # The player wanted to play against Storm Spirit
+            # Draw the game screen
+            game_screen = GameScreen(current_game_screen, game)
+            game_screen.draw(game)
+        elif current_game_screen == 'self':
+            # The player wanted to play against himself
             # Draw the game screen
             game_screen = GameScreen(current_game_screen, game)
             game_screen.draw(game)
@@ -372,6 +396,10 @@ def main():
                                     main_menu.text_strings[2]):
                                 # User chose to play against himself
                                 current_game_screen = "self"
+                                # Reset the necessary two player variables
+                                p1_moved = 0
+                                p2_moved = 0
+                                p1_turn = 1
                             elif(main_menu.text_strings[main_menu.
                                     text_positions.index(pos)] == main_menu.
                                     text_strings[3]):
@@ -405,24 +433,79 @@ def main():
                                         index(location_rect)]] = 'o'
                                     # Set the player's 'moved' flag
                                     moved = 1
+                elif(current_game_screen == 'self'):
+                    # Player is playing against himself
+                    # Check whether we have pressed quit
+                    if((eventX > quit_rect.left and eventX < quit_rect.right)
+                            and (eventY > quit_rect.top and eventY <
+                            quit_rect.bottom)):
+                        quit = 1
+                        current_game_screen = "main"
+                    else:
+                        # Check whether we have pressed one of the tiles in the
+                        # grid
+                        for location_rect in location_rects:
+                            if((eventX > location_rect.left and eventX <
+                                    location_rect.right) and (eventY >
+                                    location_rect.top and eventY <
+                                    location_rect.bottom)):
+                                # One of the players has clicked one of the
+                                # locations.
+                                if(game.board[location_names[location_rects.
+                                        index(location_rect)]] == '-'):
+                                    # The location is empty, let's mark it with
+                                    # the mark of the player whose turn is
+                                    # currently on.
+                                    if p1_turn:
+                                        # It's player one's turn
+                                        game.board[location_names[
+                                            location_rects.index(
+                                            location_rect)]] = 'o'
+                                        p1_moved = 1
+                                    else:
+                                        # It's player two's turn
+                                        game.board[location_names[
+                                            location_rects.index(
+                                            location_rect)]] = 'x'
+                                        p2_moved = 1
 
         if not quit:
             # Game flow controller
             if not (game.check_winner('x') or game.check_winner('o')):
                 # There is still no winner in the game.
                 # Keep going with the game flow.
-                if moved:
-                    # Player has made their move, the other player should make
-                    # their move now.
-                    # Let's check who the opponent is.
-                    if current_game_screen == 'timbersaw':
-                        timbersaw.move(game.board)
-                    elif current_game_screen == 'storm_spirit':
-                        storm_spirit.move(game.board)
-                    # Reset the moved flag
-                    moved = 0
-                    # Display a CLI view of the board
-                    game.display_board()
+                if current_game_screen is not 'self':
+                    # We are playing single player mode against AI
+                    if moved:
+                        # Player has made their move, the other player should make
+                        # their move now.
+                        # Let's check who the opponent is.
+                        if current_game_screen == 'timbersaw':
+                            timbersaw.move(game.board)
+                        elif current_game_screen == 'storm_spirit':
+                            storm_spirit.move(game.board)
+                        # Reset the moved flag
+                        moved = 0
+                        # Display a CLI view of the board
+                        game.display_board()
+                else:
+                    # We are playing two player mode
+                    if p1_moved:
+                        # The first player has made their move, the other
+                        # player should make their move now.
+                        p1_moved = 0
+                        # Set the turn of the second player
+                        p1_turn = 0
+                        # Display a CLI view of the board
+                        game.display_board()
+                    elif p2_moved:
+                        # The second player has made their move, the first
+                        # player should make their move now.
+                        p2_moved = 0
+                        p1_turn = 1
+                        # Display a CLI view of the board
+                        game.display_board()
+
             else:
                 # Increment the winner's score.
                 if game.check_winner('x'):
@@ -431,6 +514,10 @@ def main():
                     game.player_score += 1
                 # Reset the moved flag
                 moved = 0
+                # Reset the two player flags, if necessary
+                p1_moved = 0
+                p2_moved = 0
+                p1_turn = 1
                 pygame.display.flip()
                 # Put a 3 sec delay
                 pygame.time.wait(1500)
