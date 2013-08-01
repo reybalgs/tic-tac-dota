@@ -270,6 +270,32 @@ def play_music(music_path):
     pygame.mixer.music.load(music_path)
     pygame.mixer.music.play(-1)
 
+def play_win_effect(opponent, winner):
+    """
+    Plays a winning sound effect depending on the game mode, opponent, and the
+    winner.
+    """
+    if(opponent is not 'self'):
+        # We are playing against AI
+        if winner is 'o':
+            # The player won
+            path = os.path.join(".", "sounds", "player_win.ogg")
+        else:
+            # The AI won
+            path = os.path.join(".", "sounds", "p2_win.ogg")
+    else:
+        # We are playing a two player game
+        if winner is 'o':
+            # Player 1 won
+            path = os.path.join(".", "sounds", "p1_win.ogg")
+        else:
+            # Player 2 won
+            path = os.path.join(".", "sounds", "p2_win.ogg")
+    print path
+    sound = pygame.mixer.Sound(path)
+    sound.set_volume(0.35)
+    sound.play()
+
 def play_sound_win(opponent):
     """
     Plays the losing sound of the AI opponent, depending on who he is.
@@ -570,11 +596,13 @@ def main():
                 # Increment the winner's score.
                 if game.check_winner('x'):
                     game.opponent_score += 1
+                    play_win_effect(current_game_screen, 'x')
                     if current_game_screen is not 'self':
                         # Play the winning sound of the AI
                         sound_length = play_sound_lose(current_game_screen)
                 elif game.check_winner('o'):
                     game.player_score += 1
+                    play_win_effect(current_game_screen, 'o')
                     if current_game_screen is not 'self':
                         # Play the losing sound of the AI
                         sound_length = play_sound_win(current_game_screen)
