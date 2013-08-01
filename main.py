@@ -267,7 +267,9 @@ def play_music(music_path):
     print("Loaded music: " + music_path)
 
     # Play the background music
+    pygame.mixer.music.set_volume(0.5)
     pygame.mixer.music.load(music_path)
+    pygame.mixer.music.set_volume(0.5)
     pygame.mixer.music.play(-1)
 
 def play_win_effect(opponent, winner):
@@ -367,15 +369,15 @@ def main():
 
     # Start the background music
     pygame.mixer.init(FREQ, BITSIZE, CHANNELS, BUFFER)
-    #play_music(os.path.join(MUSIC_DIR, "monokuma.ogg"))
+    play_music(os.path.join(MUSIC_DIR, "monokuma.ogg"))
 
     # Initialize a channel for UI sounds
     ui_sound_channel = pygame.mixer.Channel(0)
     voice_sound_channel = pygame.mixer.Channel(1)
     # Initialize the sound used for clicks
-    click_sound = pygame.mixer.Sound(os.path.join("sound", "click.wav"))
+    click_sound = pygame.mixer.Sound(os.path.join("sounds", "click.wav"))
     # DEBUG: Print the sound path
-    print("Click sound loaded from: " + os.path.join("sound", "click.wav"))
+    print("Click sound loaded from: " + os.path.join("sounds", "click.wav"))
 
     # Print the number of channels
     print('Number of channels: ' + str(pygame.mixer.get_num_channels()))
@@ -489,7 +491,7 @@ def main():
                                 sys.exit(0)
                             print('Screen changed to ' + current_game_screen)
                             # Play a sound
-                            ui_sound_channel.play(click_sound)
+                            click_sound.play()
                 elif(current_game_screen == 'timbersaw' or current_game_screen
                         == 'storm_spirit'):
                     # Check whether we have pressed quit
@@ -517,6 +519,8 @@ def main():
                                     moved = 1
                     game.display_board()
                     game_screen.draw(game)
+                    # Play a sound
+                    click_sound.play()
                 elif(current_game_screen == 'self'):
                     # Player is playing against himself
                     # Check whether we have pressed quit
@@ -554,6 +558,8 @@ def main():
                                         p2_moved = 1
                     game.display_board()
                     game_screen.draw(game)
+                    # Play a sound
+                    click_sound.play()
 
         if not quit:
             # Game flow controller
