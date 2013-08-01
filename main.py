@@ -92,7 +92,6 @@ class GameScreen():
         """
         Draws the game board. Takes data from the TicTacToe game class.
         """
-        print display_spree
         # A variable to track which location we are in.
         location = 1
 
@@ -330,6 +329,39 @@ def play_music(music_path):
     pygame.mixer.music.set_volume(0.5)
     pygame.mixer.music.play(-1)
 
+def play_spree_sound(spree):
+    """
+    Plays the appropriate spree sound depending on the supplied argument.
+    """
+    if spree == 3:
+        # Killing spree
+        filename = "killingspree"
+    elif spree == 4:
+        # Dominating
+        filename = "dominating"
+    elif spree == 5:
+        # Mega kill
+        filename = "megakill"
+    elif spree == 6:
+        # Unstoppable
+        filename = "unstoppable"
+    elif spree == 7:
+        # Wicked Sick
+        filename = "wickedsick"
+    elif spree == 8:
+        # Monster Kill
+        filename = "monsterkill"
+    elif spree == 9:
+        # Godlike
+        filename = "godlike"
+    elif spree >= 10:
+        # Beyond godlike
+        filename = "beyondgodlike"
+    path = os.path.join(".", "sounds", "spree", filename + ".ogg")
+    sound = pygame.mixer.Sound(path)
+    sound.set_volume(0.65)
+    sound.play()
+
 def play_win_effect(opponent, winner):
     """
     Plays a winning sound effect depending on the game mode, opponent, and the
@@ -490,7 +522,7 @@ def main():
 
     # Start the background music
     pygame.mixer.init(FREQ, BITSIZE, CHANNELS, BUFFER)
-    #play_music(os.path.join(MUSIC_DIR, "monokuma.ogg"))
+    play_music(os.path.join(MUSIC_DIR, "monokuma.ogg"))
 
     # Initialize a channel for UI sounds
     ui_sound_channel = pygame.mixer.Channel(0)
@@ -750,6 +782,10 @@ def main():
                 p2_moved = 0
                 p1_turn = 1
                 if(game.player_spree >= 3 or game.opponent_spree >= 3):
+                    if game.player_spree > game.opponent_spree:
+                        play_spree_sound(game.player_spree)
+                    else:
+                        play_spree_sound(game.opponent_spree)
                     game_screen.draw(game, True)
                 else:
                     game_screen.draw(game)
