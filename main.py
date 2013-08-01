@@ -9,7 +9,7 @@
 # The main Python file for the game. Run this to run the game.
 
 # Import important modules
-import os, random, pygame, sys
+import os, random, pygame, sys, pdb
 from pygame.locals import *
 
 # Import game modules
@@ -18,7 +18,7 @@ from ai_stormspirit import *
 from tictactoe_game import *
 
 # Important constants
-FPS = 25 # speed of the game
+FPS = 10 # speed of the game
 WINDOWWIDTH = 640 # width of the game window, in pixels
 WINDOWHEIGHT = 480 # height of the game window, in pixels
 
@@ -141,7 +141,7 @@ class GameScreen():
         if game.check_winner('o'):
             #screen.blit(self.player_lose, (5, 5))
             screen.blit(self.player_win, (5, 5))
-        if game.check_winner('x'):
+        elif game.check_winner('x'):
             screen.blit(self.player_lose, (5, 5))
             #screen.blit(self.player_win, (5, 5))
 
@@ -433,6 +433,8 @@ def main():
                                         index(location_rect)]] = 'o'
                                     # Set the player's 'moved' flag
                                     moved = 1
+                    game.display_board()
+                    game_screen.draw(game)
                 elif(current_game_screen == 'self'):
                     # Player is playing against himself
                     # Check whether we have pressed quit
@@ -468,6 +470,8 @@ def main():
                                             location_rects.index(
                                             location_rect)]] = 'x'
                                         p2_moved = 1
+                    game.display_board()
+                    game_screen.draw(game)
 
         if not quit:
             # Game flow controller
@@ -518,6 +522,7 @@ def main():
                 p1_moved = 0
                 p2_moved = 0
                 p1_turn = 1
+                game_screen.draw(game)
                 pygame.display.flip()
                 # Put a 3 sec delay
                 pygame.time.wait(1500)
@@ -533,7 +538,6 @@ def main():
 
         # Check if the board is full, reset if necessary
         if game.is_board_full():
-            pygame.time.wait(1500)
             game.clear_board()
             # Reset the two-player variables, if necessary
             if current_game_screen == 'self':
