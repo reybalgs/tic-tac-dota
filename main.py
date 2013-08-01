@@ -56,7 +56,9 @@ clock = pygame.time.Clock()
 menu_text_font = pygame.font.Font(ARIAL_PATH, 36)
 name_text_font = pygame.font.Font(ARIAL_PATH, 28)
 score_text_font = pygame.font.Font(ARIAL_PATH, 60)
-spree_text_font = pygame.font.Font(ARIAL_PATH, 65)
+score_text_font.set_bold(True)
+spree_text_font = pygame.font.Font(ARIAL_PATH, 60)
+spree_text_font.set_bold(True)
 
 # Positions
 main_menu_text_pos = list()
