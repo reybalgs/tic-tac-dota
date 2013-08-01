@@ -289,6 +289,31 @@ def play_sound_win(opponent):
     # Play the sound
     voice_sound.play()
 
+    # Return the length of the sound
+    return int(voice_sound.get_length() * 1000)
+
+def play_sound_lose(opponent):
+    """
+    Plays the winning sound of the AI opponent, depending on who he is.
+    """
+    if(opponent is 'timbersaw'):
+        # Play timbersaw's winning sound
+        num = random.randint(1,4)
+        path = os.path.join(".", "sounds", "timbersaw", "timbersaw_win" +
+                str(num) + ".ogg")
+        print path
+        voice_sound = pygame.mixer.Sound(path)
+    else:
+        # Play storm spirit's losing sound
+        num = random.randint(1,3)
+        path = os.path.join(".", "sounds", "storm_spirit", "storm_win" +
+                str(num) + ".ogg")
+        print path
+        voice_sound = pygame.mixer.Sound(path)
+    # Play the sound
+    voice_sound.play()
+
+    # Return the length of the sound
     return int(voice_sound.get_length() * 1000)
 
 def draw_timbersaw(pos_x, pos_y):
@@ -545,9 +570,13 @@ def main():
                 # Increment the winner's score.
                 if game.check_winner('x'):
                     game.opponent_score += 1
+                    if current_game_screen is not 'self':
+                        # Play the winning sound of the AI
+                        sound_length = play_sound_lose(current_game_screen)
                 elif game.check_winner('o'):
                     game.player_score += 1
                     if current_game_screen is not 'self':
+                        # Play the losing sound of the AI
                         sound_length = play_sound_win(current_game_screen)
                 # Reset the moved flag
                 moved = 0
@@ -558,8 +587,7 @@ def main():
                 game_screen.draw(game)
                 pygame.display.flip()
                 # Put a 3 sec delay
-                if(game.check_winner('o') and current_game_screen !=
-                        'self'):
+                if(current_game_screen != 'self'):
                     pygame.time.wait(sound_length)
                 if(current_game_screen == 'self'):
                     pygame.time.wait(1000)
