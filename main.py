@@ -344,6 +344,32 @@ def play_sound_lose(opponent):
     # Return the length of the sound
     return int(voice_sound.get_length() * 1000)
 
+def play_sound_premove(opponent):
+    """
+    Rolls and plays a premove sound of the AI specified.
+    """
+    # 15% chance
+    roll = random.randint(1,6)
+
+    if roll == 1:
+        # We play a sound
+        if opponent is 'timbersaw':
+            num = random.randint(1,4)
+            path = os.path.join(".", "sounds", "timbersaw", "timbersaw_premove"
+                    + str(num) + ".ogg")
+        else:
+            num = random.randint(1,3)
+            path = os.path.join(".", "sounds", "storm_spirit", "storm_postmove"
+                    + str(num) + ".ogg")
+        print path
+        # Play the sound
+        sound = pygame.mixer.Sound(path)
+        sound.play()
+
+        return int(sound.get_length() * 1000)
+    else:
+        return 0
+
 def play_sound_enter(opponent):
     """
     Plays a voice sound of the AI whenever the player starts a new game with
@@ -384,7 +410,7 @@ def main():
 
     # Start the background music
     pygame.mixer.init(FREQ, BITSIZE, CHANNELS, BUFFER)
-    play_music(os.path.join(MUSIC_DIR, "monokuma.ogg"))
+    #play_music(os.path.join(MUSIC_DIR, "monokuma.ogg"))
 
     # Initialize a channel for UI sounds
     ui_sound_channel = pygame.mixer.Channel(0)
@@ -590,8 +616,10 @@ def main():
                         # their move now.
                         # Let's check who the opponent is.
                         if current_game_screen == 'timbersaw':
+                            wait = play_sound_premove(current_game_screen)
                             timbersaw.move(game.board)
                         elif current_game_screen == 'storm_spirit':
+                            wait = play_sound_premove(current_game_screen)
                             storm_spirit.move(game.board)
                         # Reset the moved flag
                         moved = 0
