@@ -438,8 +438,8 @@ def play_sound_premove(opponent):
     """
     Rolls and plays a premove sound of the AI specified.
     """
-    # 15% chance
-    roll = random.randint(1,6)
+    # 10% chance
+    roll = random.randint(1,10)
 
     if roll == 1:
         # We play a sound
@@ -464,8 +464,8 @@ def play_sound_newround(opponent):
     """
     Rolls and plays a newround sound of the AI specified.
     """
-    # 25% chance
-    roll = random.randint(0,4)
+    # 20% chance
+    roll = random.randint(0,5)
 
     if roll == 1:
         # We play a sound
