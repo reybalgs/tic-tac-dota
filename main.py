@@ -344,6 +344,21 @@ def play_sound_lose(opponent):
     # Return the length of the sound
     return int(voice_sound.get_length() * 1000)
 
+def play_sound_enter(opponent):
+    """
+    Plays a voice sound of the AI whenever the player starts a new game with
+    them.
+    """
+    if opponent is 'timbersaw':
+        path = os.path.join(".", "sounds", "timbersaw", "timber_startgame.ogg")
+    else:
+        path = os.path.join(".", "sounds", "storm_spirit",
+                "storm_startgame.ogg")
+    print path
+    # Play the sound
+    sound = pygame.mixer.Sound(path)
+    sound.play()
+
 def draw_timbersaw(pos_x, pos_y):
     """
     Draws timbersaw on the specified x and y coordinates.
@@ -470,11 +485,13 @@ def main():
                                     main_menu.text_strings[0]):
                                 # User chose to play against Timbersaw
                                 current_game_screen = "timbersaw"
+                                play_sound_enter(current_game_screen)
                             elif(main_menu.text_strings[main_menu.
                                    text_positions.index(pos)] ==
                                    main_menu.text_strings[1]):
                                 # User chose to play against Storm Spirit
                                 current_game_screen = "storm_spirit"
+                                play_sound_enter(current_game_screen)
                             elif(main_menu.text_strings[main_menu.
                                     text_positions.index(pos)] ==
                                     main_menu.text_strings[2]):
