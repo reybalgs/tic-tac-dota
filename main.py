@@ -88,7 +88,7 @@ class GameScreen():
     is defined in the tictactoe_game.py file, in the TicTacToe() class.
     """
 
-    def draw(self, game, display_spree=0):
+    def draw(self, game, display_spree=0, first_blood=0):
         """
         Draws the game board. Takes data from the TicTacToe game class.
         """
@@ -155,6 +155,13 @@ class GameScreen():
         elif game.check_winner('x'):
             screen.blit(self.player_lose, (5, 5))
             #screen.blit(self.player_win, (5, 5))
+        # Display first blood, if applicable
+        if(first_blood):
+            print('First blood is true')
+            pos = self.first_blood_text.get_rect(centerx =
+                    background.get_width() / 2, centery =
+                    background.get_height() / 2)
+            screen.blit(self.first_blood_text, pos)
         # Display the spree messages, if any
         if(display_spree):
             # Get the position of the spree text
@@ -275,6 +282,8 @@ class GameScreen():
         # Initialize the spree text, if any
         if(game.player_spree >= 2 or game.opponent_spree >= 2):
             self.spree_text = self.create_spree_text(game)
+        # Initialize the first blood text.
+        self.first_blood_text = spree_text_font.render("FIRST BLOOD!", 1, RED)
         # Initialize the marks on the game board.
         self.mark_x = pygame.transform.smoothscale(pygame.image.load(
             os.path.join("images", "cross.png")), (80,80))
@@ -359,6 +368,15 @@ def play_spree_sound(spree):
         filename = "beyondgodlike"
     path = os.path.join(".", "sounds", "spree", filename + ".ogg")
     sound = pygame.mixer.Sound(path)
+    sound.set_volume(0.65)
+    sound.play()
+
+def play_first_blood():
+    """
+    Simply plays the first blood sound file.
+    """
+    sound = pygame.mixer.Sound(os.path.join(".", "sounds", "spree",
+        "firstblood.ogg"))
     sound.set_volume(0.65)
     sound.play()
 
@@ -557,6 +575,9 @@ def main():
     # A boolean variable to check whether the player wanted to quit
     quit = 0
 
+    # A boolean variable to check whether someone has won once (first blood)
+    first_blood = 0
+
     # DEBUG: Constant testing values
     #game.board['topleft'] = 'x'
     #game.board['topcenter'] = 'o'
@@ -624,12 +645,16 @@ def main():
                                 # User chose to play against Timbersaw
                                 current_game_screen = "timbersaw"
                                 play_sound_enter(current_game_screen)
+                                # Reset first blood
+                                first_blood = 0
                             elif(main_menu.text_strings[main_menu.
                                    text_positions.index(pos)] ==
                                    main_menu.text_strings[1]):
                                 # User chose to play against Storm Spirit
                                 current_game_screen = "storm_spirit"
                                 play_sound_enter(current_game_screen)
+                                # Reset first blood
+                                first_blood = 0
                             elif(main_menu.text_strings[main_menu.
                                     text_positions.index(pos)] ==
                                     main_menu.text_strings[2]):
@@ -639,6 +664,8 @@ def main():
                                 p1_moved = 0
                                 p2_moved = 0
                                 p1_turn = 1
+                                # Reset first blood
+                                first_blood = 0
                             elif(main_menu.text_strings[main_menu.
                                     text_positions.index(pos)] == main_menu.
                                     text_strings[3]):
@@ -789,6 +816,13 @@ def main():
                     game_screen.draw(game, True)
                 else:
                     game_screen.draw(game)
+                # Check if this is a first blood
+                if not first_blood:
+                    print('Initialize first blood')
+                    play_first_blood()
+                    game_screen.draw(game, False, True)
+                    # Set first blood since it's done
+                    first_blood = 1
                 pygame.display.flip()
                 # Put a 3 sec delay
                 if(current_game_screen != 'self'):
