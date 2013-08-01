@@ -370,6 +370,28 @@ def play_sound_premove(opponent):
     else:
         return 0
 
+def play_sound_newround(opponent):
+    """
+    Rolls and plays a newround sound of the AI specified.
+    """
+    # 25% chance
+    roll = random.randint(0,4)
+
+    if roll == 1:
+        # We play a sound
+        if opponent is 'timbersaw':
+            num = random.randint(1,3)
+            path = os.path.join(".", "sounds", "timbersaw",
+                    "timbersaw_nextround" + str(num) + ".ogg")
+        else:
+            num = random.randint(1,3)
+            path = os.path.join(".", "sounds", "storm_spirit",
+                    "storm_nextround" + str(num) + ".ogg")
+        print path
+        # Play the sound
+        sound = pygame.mixer.Sound(path)
+        sound.play()
+
 def play_sound_enter(opponent):
     """
     Plays a voice sound of the AI whenever the player starts a new game with
@@ -670,6 +692,9 @@ def main():
                     pygame.time.wait(sound_length)
                 if(current_game_screen == 'self'):
                     pygame.time.wait(1000)
+                if(game.check_winner('o') and current_game_screen != 'self'):
+                    # Play the newround sound
+                    play_sound_newround(current_game_screen)
                 # Reset the board
                 game.clear_board()
         else:
