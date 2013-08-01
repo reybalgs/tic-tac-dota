@@ -21,6 +21,10 @@ from tictactoe_game import *
 FPS = 10 # speed of the game
 WINDOWWIDTH = 640 # width of the game window, in pixels
 WINDOWHEIGHT = 480 # height of the game window, in pixels
+FREQ=44100 # audio frequency
+BITSIZE = -16
+CHANNELS = 2
+BUFFER=1024
 
 # Directory and path constants
 MUSIC_DIR = os.path.join("sounds", "music")
@@ -266,6 +270,27 @@ def play_music(music_path):
     pygame.mixer.music.load(music_path)
     pygame.mixer.music.play(-1)
 
+def play_sound_win(opponent):
+    """
+    Plays the losing sound of the AI opponent, depending on who he is.
+    """
+    if(opponent is 'timbersaw'):
+        # Play Timbersaw's losing sound
+        num = random.randint(1,4)
+        path = os.path.join(".", "sounds", "timbersaw", "timbersaw_lose" +
+                str(num) + ".ogg")
+        print path
+        voice_sound = pygame.mixer.Sound(path)
+    else:
+        # Play storm spirit's losing sound
+        num = random.randint(1,3)
+        voice_sound = pygame.mixer.Sound(os.path.join(".", "sounds",
+            "storm_spirit", "storm_lose" + str(num) + ".ogg"))
+    # Play the sound
+    voice_sound.play()
+
+    return int(voice_sound.get_length() * 1000)
+
 def draw_timbersaw(pos_x, pos_y):
     """
     Draws timbersaw on the specified x and y coordinates.
@@ -290,13 +315,19 @@ def main():
     current_game_screen = "main"
 
     # Start the background music
-    pygame.mixer.init()
+    pygame.mixer.init(FREQ, BITSIZE, CHANNELS, BUFFER)
     #play_music(os.path.join(MUSIC_DIR, "monokuma.ogg"))
 
+    # Initialize a channel for UI sounds
+    ui_sound_channel = pygame.mixer.Channel(0)
+    voice_sound_channel = pygame.mixer.Channel(1)
     # Initialize the sound used for clicks
-    click_sound = pygame.mixer.Sound(os.path.join("sound", "click.ogg"))
+    click_sound = pygame.mixer.Sound(os.path.join("sound", "click.wav"))
     # DEBUG: Print the sound path
-    print("Click sound loaded from: " + os.path.join("sound", "click.ogg"))
+    print("Click sound loaded from: " + os.path.join("sound", "click.wav"))
+
+    # Print the number of channels
+    print('Number of channels: ' + str(pygame.mixer.get_num_channels()))
 
     # Initialize the Timbersaw and Storm Spirit AIs
     timbersaw = Timbersaw()
@@ -407,7 +438,7 @@ def main():
                                 sys.exit(0)
                             print('Screen changed to ' + current_game_screen)
                             # Play a sound
-                            click_sound.play()
+                            ui_sound_channel.play(click_sound)
                 elif(current_game_screen == 'timbersaw' or current_game_screen
                         == 'storm_spirit'):
                     # Check whether we have pressed quit
@@ -516,6 +547,8 @@ def main():
                     game.opponent_score += 1
                 elif game.check_winner('o'):
                     game.player_score += 1
+                    if current_game_screen is not 'self':
+                        sound_length = play_sound_win(current_game_screen)
                 # Reset the moved flag
                 moved = 0
                 # Reset the two player flags, if necessary
@@ -525,7 +558,11 @@ def main():
                 game_screen.draw(game)
                 pygame.display.flip()
                 # Put a 3 sec delay
-                pygame.time.wait(1500)
+                if(game.check_winner('o') and current_game_screen !=
+                        'self'):
+                    pygame.time.wait(sound_length)
+                if(current_game_screen == 'self'):
+                    pygame.time.wait(1000)
                 # Reset the board
                 game.clear_board()
         else:
