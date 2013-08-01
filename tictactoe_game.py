@@ -26,6 +26,8 @@ class TicTacToe():
                 'bottomleft':'-', 'bottomcenter':'-', 'bottomright':'-'}
         self.player_score = 0
         self.opponent_score = 0
+        self.player_spree = 0
+        self.opponent_spree = 0
 
     def get_location_key(self, location_num):
         """
@@ -126,6 +128,8 @@ class TicTacToe():
         """
         self.player_score = 0
         self.opponent_score = 0
+        self.player_spree = 0
+        self.opponent_spree = 0
 
     def clear_board(self):
         """

@@ -37,6 +37,12 @@ GRAY = (100,100,100)
 RED = (255,0,0)
 GREEN = (0,255,0)
 BLUE = (0,0,255)
+PURPLE = (120, 0, 120)
+ORANGE = (255,150,0)
+CYAN = (100,255,255)
+YELLOW = (255,255,0)
+PINK = (255,100,255)
+BRONZE = (80,80,0)
 
 # Initialize Pygame and its window
 pygame.init()
@@ -50,6 +56,7 @@ clock = pygame.time.Clock()
 menu_text_font = pygame.font.Font(ARIAL_PATH, 36)
 name_text_font = pygame.font.Font(ARIAL_PATH, 28)
 score_text_font = pygame.font.Font(ARIAL_PATH, 60)
+spree_text_font = pygame.font.Font(ARIAL_PATH, 65)
 
 # Positions
 main_menu_text_pos = list()
@@ -81,10 +88,11 @@ class GameScreen():
     is defined in the tictactoe_game.py file, in the TicTacToe() class.
     """
 
-    def draw(self, game):
+    def draw(self, game, display_spree=0):
         """
         Draws the game board. Takes data from the TicTacToe game class.
         """
+        print display_spree
         # A variable to track which location we are in.
         location = 1
 
@@ -148,6 +156,53 @@ class GameScreen():
         elif game.check_winner('x'):
             screen.blit(self.player_lose, (5, 5))
             #screen.blit(self.player_win, (5, 5))
+        # Display the spree messages, if any
+        if(display_spree):
+            # Get the position of the spree text
+            pos = self.spree_text.get_rect(centerx = background.get_width() /
+                    2, centery = background.get_height() / 2)
+            screen.blit(self.spree_text, pos)
+
+    def create_spree_text(self, game):
+        """
+        Returns the appropriate spree text depending on the current spree of
+        either player.
+        """
+        if game.player_spree == 2 or game.opponent_spree == 2:
+            # Killing spree
+            text = spree_text_font.render("KILLING SPREE!", 1, GREEN)
+            return text
+        elif game.player_spree == 3 or game.opponent_spree == 3:
+            # Dominating
+            text = spree_text_font.render("DOMINATING!", 1, PURPLE)
+            return text
+        elif game.player_spree == 4 or game.opponent_spree == 4:
+            # Mega kill
+            text = spree_text_font.render("MEGA KILL!", 1, PINK)
+            return text
+        elif game.player_spree == 5 or game.opponent_spree == 5:
+            # Unstoppable
+            text = spree_text_font.render("UNSTOPPABLE!", 1, ORANGE)
+            return text
+        elif game.player_spree == 6 or game.opponent_spree == 6:
+            # Wicked Sick
+            text = spree_text_font.render("WICKED SICK!", 1, BRONZE)
+            return text
+        elif game.player_spree == 7 or game.opponent_spree == 7:
+            # Monster Kill
+            text = spree_text_font.render("MONSTER KILL!", 1, CYAN)
+            return text
+        elif game.player_spree == 8 or game.opponent_spree == 8:
+            # Godlike
+            text = spree_text_font.render("GODLIKE!", 1, RED)
+            return text
+        elif game.player_spree >= 9 or game.opponent_spree >= 9:
+            # Beyond Godlike
+            text = spree_text_font.render("BEYOND GODLIKE!", 1, ORANGE)
+            return text
+        else:
+            text = spree_text_font.render("ERROR", 1, BLACK)
+            return text
 
     def __init__(self, opponent, game):
         """
@@ -218,6 +273,9 @@ class GameScreen():
                 " wins!", 1, BLUE)
         elif opponent == 'self':
             self.player_lose = name_text_font.render("Player 2 wins!", 1, BLUE)
+        # Initialize the spree text, if any
+        if(game.player_spree >= 2 or game.opponent_spree >= 2):
+            self.spree_text = self.create_spree_text(game)
         # Initialize the marks on the game board.
         self.mark_x = pygame.transform.smoothscale(pygame.image.load(
             os.path.join("images", "cross.png")), (80,80))
@@ -495,17 +553,17 @@ def main():
             # The player wanted to play against timbersaw
             # Draw the game screen
             game_screen = GameScreen(current_game_screen, game)
-            game_screen.draw(game)
+            game_screen.draw(game, False)
         elif current_game_screen == 'storm_spirit':
             # The player wanted to play against Storm Spirit
             # Draw the game screen
             game_screen = GameScreen(current_game_screen, game)
-            game_screen.draw(game)
+            game_screen.draw(game, False)
         elif current_game_screen == 'self':
             # The player wanted to play against himself
             # Draw the game screen
             game_screen = GameScreen(current_game_screen, game)
-            game_screen.draw(game)
+            game_screen.draw(game, False)
 
         # Event handler
         for event in (pygame.event.get()):
@@ -669,12 +727,18 @@ def main():
                 # Increment the winner's score.
                 if game.check_winner('x'):
                     game.opponent_score += 1
+                    # Set the spree values
+                    game.opponent_spree += 1
+                    game.player_spree = 0
                     play_win_effect(current_game_screen, 'x')
                     if current_game_screen is not 'self':
                         # Play the winning sound of the AI
                         sound_length = play_sound_lose(current_game_screen)
                 elif game.check_winner('o'):
                     game.player_score += 1
+                    # Set the spree values
+                    game.player_spree += 1
+                    game.opponent_spree = 0
                     play_win_effect(current_game_screen, 'o')
                     if current_game_screen is not 'self':
                         # Play the losing sound of the AI
@@ -685,7 +749,10 @@ def main():
                 p1_moved = 0
                 p2_moved = 0
                 p1_turn = 1
-                game_screen.draw(game)
+                if(game.player_spree >= 3 or game.opponent_spree >= 3):
+                    game_screen.draw(game, True)
+                else:
+                    game_screen.draw(game)
                 pygame.display.flip()
                 # Put a 3 sec delay
                 if(current_game_screen != 'self'):
